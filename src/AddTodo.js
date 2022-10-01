@@ -1,13 +1,27 @@
+import { useMutation } from "@apollo/client";
 import React, { useState } from "react";
 import {View, StyleSheet, Button, TextInput, Alert } from 'react-native'
+import { ADD_TODO } from "./mutations/AddTodo";
+import { GET_TODOS } from "./queries/TodoQueries";
 
 
-export const AddTodo = ({ onSubmit }) => {
+export const AddTodo = () => {
     const [value, setValue] = useState('')
+    const [addTodo] = useMutation( ADD_TODO, {
+        variables: { title: value },
+        update(cache, {data: {addTodo}}) {
+            const {todos} = cache.readQuery({query: GET_TODOS })
+            cache.writeQuery({
+                query: GET_TODOS,
+                data: { todos: [...todos, addTodo]}
+            })
+        }
+
+    })
 
     const pressHandler = () => {
         if (value.trim()) {
-            onSubmit(value)
+            addTodo(value)
             setValue('')
         } else {
             Alert.alert('Null input')

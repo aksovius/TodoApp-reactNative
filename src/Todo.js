@@ -1,12 +1,25 @@
+import { useMutation } from "@apollo/client";
 import React from "react";
 import {Text, View, StyleSheet, TouchableOpacity} from 'react-native'
+import { DELETE_TODO } from "./mutations/AddTodo";
+import { GET_TODOS } from "./queries/TodoQueries";
 
-export const Todo = ({todo, onRemove}) => {
+export const Todo = ({todo}) => {
+    const [deleteTodo] = useMutation(DELETE_TODO, {
+        variables: {id: todo.id},
+        update(cache, {data: {deleteTodo}}) {
+            const {todos} = cache.readQuery({query: GET_TODOS })
+            cache.writeQuery({
+                query: GET_TODOS,
+                data: {todos: todos.filter(t => t.id !== deleteTodo.id)}
+            })
+        }
+    })
     return (
         <TouchableOpacity 
             activeOpacity={0.5}
             onPress={() => console.log('presed', todo.id)}
-            onLongPress={onRemove.bind(null, todo.id)}  // bind new function
+            onLongPress={deleteTodo.bind(null, todo.id)}  // bind new function
         >
             <View style={styles.todo}>
                 <Text>{todo.title}</Text>
