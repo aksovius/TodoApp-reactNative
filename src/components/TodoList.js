@@ -3,21 +3,25 @@ import React from "react";
 import { GET_TODOS } from "../queries/TodoQueries";
 import { Todo } from '../Todo';
 import {Text, View, StyleSheet, FlatList} from 'react-native'
+import { AddTodo } from "../AddTodo";
     
 export const TodoList = () => {
     const { data, loading } = useQuery(GET_TODOS)
 
 
-    const removeTodo = id => {}
+
     if (loading)  console.log(loading)
-   
+    console.log(data)
     return (
+        <View>
+        <AddTodo/>
         <View style={styles.block}>
         <FlatList
         keyExtractor={item => item.id}
         data={data?.todos}
-        renderItem={({item}) => <Todo todo={item} onRemove={removeTodo} />}
+        renderItem={({item}) => <Todo todo={item}/>}
       /></View>
+      </View>
     )
     
 }

@@ -5,7 +5,12 @@ import { Navbar } from './src/Navbar'
 import { AppRegistry } from 'react-native';
 import { ApolloClient, InMemoryCache, ApolloProvider } from '@apollo/client';
 import { TodoList } from './src/components/TodoList';
+import  PhotoUploader  from './src/components/PhotoUploader';
+import { NavigationContainer } from '@react-navigation/native'
+import { createStackNavigator } from '@react-navigation/stack'
+import { screenOptions } from './src/styles'
 
+const Stack = createStackNavigator()
 
 // Initialize Apollo Client
 const client = new ApolloClient({
@@ -13,48 +18,35 @@ const client = new ApolloClient({
   cache: new InMemoryCache()
 });
 export default function App() {
-  
-  const [todos, setTodos] = useState([])
-  
-  const addTodo = title => {
-    // const newTodo = {
-    //   id: Date.now().toString(),
-    //   title: title
-    // }
-    // setTodos((prevTodos) => {
-    //   return [
-    //     ...prevTodos,
-    //     newTodo
-    //   ]
-    // })
-    setTodos(prev => [...prev, {
-      id: Date.now().toString(),
-      title
-    }])
-  } 
 
-  const removeTodo = id => {
-    setTodos(prev => prev.filter(todo => todo.id !== id))
-  }
-
-  console.log('aaa')
   return (
     <ApolloProvider client={client}>
-    <View >
-      <Navbar />
-      <View style={styles.container}>
-         <AddTodo onSubmit={addTodo}/>
-
-         <TodoList/>
-      </View>
-    </View>
+      <NavigationContainer>
+        {/* <Navbar /> */}
+        <Stack.Navigator initialRouteName="Home" screenOptions={screenOptions}>
+          <Stack.Screen
+            name="Home"
+            component={TodoList}
+            options={{ title: 'React Native' }}
+          />
+          <Stack.Screen
+            name="Photo Uploader"
+            component={PhotoUploader}
+            options={({
+              route: {
+                params: {
+                  chapter: { number, title },
+                },
+              },
+            }) => ({
+              title: number ? `Chapter ${number}: ${title}` : title,
+              gestureResponseDistance: { horizontal: 500 },
+            })}
+          />
+        </Stack.Navigator>
+      </NavigationContainer>
     </ApolloProvider>
   );
 }
 AppRegistry.registerComponent('MyApplication', () => App);
-const styles = StyleSheet.create({
-  container: {
-    paddingHorizontal: 30,
-    paddingVertical: 20
-  },
-});
+
